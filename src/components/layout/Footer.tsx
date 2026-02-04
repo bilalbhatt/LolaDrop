@@ -49,22 +49,22 @@ export function Footer() {
             <ul className="space-y-3 text-sm text-background/70">
               <li className="flex items-center gap-2">
                 <Phone className="h-4 w-4 text-primary" />
-                <span>+91 98765 43210</span>
+                <span>+91 96229 27445</span>
               </li>
               <li className="flex items-center gap-2">
                 <Mail className="h-4 w-4 text-primary" />
-                <span>support@lolakart.com</span>
+                <span>imbilal1312@gmail.com</span>
               </li>
               <li className="flex items-start gap-2">
                 <MapPin className="h-4 w-4 text-primary mt-0.5" />
-                <span>123 Market Street, Delhi, India</span>
+                <span>Sogam Kupwara, J&K</span>
               </li>
             </ul>
           </div>
         </div>
 
         <div className="border-t border-background/10 mt-8 pt-8 text-center text-sm text-background/50">
-          <p>© 2024 LolaKart. All rights reserved. Same day delivery promise!</p>
+          <p>© 2026 Bilal Bhatt. All rights reserved. Same day delivery promise!</p>
         </div>
       </div>
     </footer>
