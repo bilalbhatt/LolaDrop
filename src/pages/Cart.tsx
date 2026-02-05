@@ -7,6 +7,7 @@ import { Card, CardContent, CardFooter, CardHeader, CardTitle } from '@/componen
 import { Separator } from '@/components/ui/separator';
 import { ShoppingCart, Trash2, Plus, Minus, Lock, Package, ArrowRight } from 'lucide-react';
 import { Link } from 'react-router-dom';
+import { LocationPicker } from '@/components/location/LocationPicker';
 
 export default function Cart() {
   const { user } = useAuth();
@@ -151,6 +152,11 @@ export default function Cart() {
 
               {/* Order Summary */}
               <div>
+                {/* Location Picker */}
+                <div className="mb-6">
+                  <LocationPicker />
+                </div>
+
                 <Card className="sticky top-24">
                   <CardHeader>
                     <CardTitle className="font-display">Order Summary</CardTitle>

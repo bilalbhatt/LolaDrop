@@ -9,6 +9,8 @@ export interface Product {
   in_stock: boolean;
   created_at: string;
   updated_at: string;
+  discount_percentage?: number;
+  original_price?: number;
 }
 
 export interface Kit {
@@ -19,6 +21,9 @@ export interface Kit {
   is_active: boolean;
   created_at: string;
   updated_at: string;
+  latitude?: number;
+  longitude?: number;
+  delivery_address?: string;
 }
 
 export interface KitItem {

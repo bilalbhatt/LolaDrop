@@ -1,4 +1,4 @@
-import { Plus, ShoppingBag } from 'lucide-react';
+import { Plus, ShoppingBag, Percent } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Card, CardContent, CardFooter } from '@/components/ui/card';
@@ -54,9 +54,24 @@ export function ProductCard({ product }: ProductCardProps) {
           </h3>
           
           <div className="flex items-baseline gap-1">
-            <span className="font-display text-lg font-bold text-primary">
-              ₹{Number(product.price).toFixed(0)}
-            </span>
+            <div className="flex items-center gap-2">
+              <span className="font-display text-lg font-bold text-primary">
+                ₹{Number(product.price).toFixed(0)}
+              </span>
+              {product.discount_percentage && product.discount_percentage > 0 && (
+                <>
+                  {product.original_price && (
+                    <span className="text-sm text-muted-foreground line-through">
+                      ₹{Number(product.original_price).toFixed(0)}
+                    </span>
+                  )}
+                  <Badge variant="secondary" className="bg-secondary/20 text-secondary-foreground text-xs">
+                    <Percent className="h-3 w-3 mr-0.5" />
+                    {product.discount_percentage}% OFF
+                  </Badge>
+                </>
+              )}
+            </div>
             <span className="text-xs text-muted-foreground">/{product.unit}</span>
           </div>
         </div>

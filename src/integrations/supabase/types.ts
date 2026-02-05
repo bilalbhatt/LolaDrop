@@ -164,10 +164,12 @@ export type Database = {
           category: string | null
           created_at: string
           description: string | null
+          discount_percentage: number | null
           id: string
           image_url: string | null
           in_stock: boolean | null
           name: string
+          original_price: number | null
           price: number
           unit: string
           updated_at: string
@@ -176,10 +178,12 @@ export type Database = {
           category?: string | null
           created_at?: string
           description?: string | null
+          discount_percentage?: number | null
           id?: string
           image_url?: string | null
           in_stock?: boolean | null
           name: string
+          original_price?: number | null
           price: number
           unit?: string
           updated_at?: string
@@ -188,10 +192,12 @@ export type Database = {
           category?: string | null
           created_at?: string
           description?: string | null
+          discount_percentage?: number | null
           id?: string
           image_url?: string | null
           in_stock?: boolean | null
           name?: string
+          original_price?: number | null
           price?: number
           unit?: string
           updated_at?: string
@@ -202,8 +208,11 @@ export type Database = {
         Row: {
           address: string | null
           created_at: string
+          delivery_address: string | null
           full_name: string | null
           id: string
+          latitude: number | null
+          longitude: number | null
           phone: string | null
           updated_at: string
           user_id: string
@@ -211,8 +220,11 @@ export type Database = {
         Insert: {
           address?: string | null
           created_at?: string
+          delivery_address?: string | null
           full_name?: string | null
           id?: string
+          latitude?: number | null
+          longitude?: number | null
           phone?: string | null
           updated_at?: string
           user_id: string
@@ -220,8 +232,11 @@ export type Database = {
         Update: {
           address?: string | null
           created_at?: string
+          delivery_address?: string | null
           full_name?: string | null
           id?: string
+          latitude?: number | null
+          longitude?: number | null
           phone?: string | null
           updated_at?: string
           user_id?: string

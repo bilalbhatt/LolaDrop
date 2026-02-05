@@ -13,7 +13,7 @@ export function Footer() {
                 <Zap className="h-5 w-5 text-primary-foreground" />
               </div>
               <span className="font-display text-xl font-bold">
-                Lola<span className="text-primary">Kart</span>
+                Lola<span className="text-primary">Drop</span>
               </span>
             </div>
             <p className="text-sm text-background/70">
@@ -64,7 +64,7 @@ export function Footer() {
         </div>
 
         <div className="border-t border-background/10 mt-8 pt-8 text-center text-sm text-background/50">
-          <p>© 2026 Bilal Bhatt. All rights reserved. Same day delivery promise!</p>
+          <p>© 2026 LolaDrop. All rights reserved. Same day delivery promise!</p>
         </div>
       </div>
     </footer>
