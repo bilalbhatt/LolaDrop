@@ -29,7 +29,7 @@ export function Header() {
             <Zap className="h-5 w-5 text-primary-foreground" />
           </div>
           <span className="font-display text-xl font-bold text-foreground">
-            Lola<span className="text-primary">Kart</span>
+            Lola<span className="text-primary">Drop</span>
           </span>
         </Link>
 
