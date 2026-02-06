@@ -177,10 +177,12 @@ export default function Cart() {
                     </div>
                   </CardContent>
                   <CardFooter>
-                    <Button className="w-full bg-gradient-hero hover:opacity-90" size="lg">
-                      Proceed to Checkout
-                      <ArrowRight className="h-4 w-4 ml-2" />
-                    </Button>
+                    <Link to="/checkout" className="w-full">
+                      <Button className="w-full bg-gradient-hero hover:opacity-90" size="lg">
+                        Proceed to Checkout
+                        <ArrowRight className="h-4 w-4 ml-2" />
+                      </Button>
+                    </Link>
                   </CardFooter>
                 </Card>
               </div>

@@ -65,6 +65,9 @@ export interface Profile {
   full_name: string | null;
   phone: string | null;
   address: string | null;
+  delivery_address: string | null;
+  latitude: number | null;
+  longitude: number | null;
   created_at: string;
   updated_at: string;
 }
@@ -72,5 +75,71 @@ export interface Profile {
 export interface UserRole {
   id: string;
   user_id: string;
-  role: 'admin' | 'user';
+  role: 'admin' | 'user' | 'delivery_partner';
+}
+
+export interface Order {
+  id: string;
+  user_id: string;
+  delivery_partner_id: string | null;
+  status: 'placed' | 'confirmed' | 'packed' | 'out_for_delivery' | 'delivered' | 'cancelled';
+  total_amount: number;
+  delivery_address: string | null;
+  delivery_latitude: number | null;
+  delivery_longitude: number | null;
+  delivery_instructions: string | null;
+  otp_code: string | null;
+  payment_method: 'cod' | 'upi';
+  payment_status: 'pending' | 'completed' | 'failed';
+  created_at: string;
+  updated_at: string;
+  order_items?: OrderItem[];
+  profile?: Profile;
+  delivery_partner?: DeliveryPartner;
+}
+
+export interface OrderItem {
+  id: string;
+  order_id: string;
+  product_id: string;
+  quantity: number;
+  unit_price: number;
+  total_price: number;
+  created_at: string;
+  product?: Product;
+}
+
+export interface Feedback {
+  id: string;
+  user_id: string;
+  type: 'feedback' | 'suggestion' | 'complaint';
+  message: string;
+  status: 'pending' | 'reviewed' | 'resolved';
+  admin_response: string | null;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface UserMessage {
+  id: string;
+  user_id: string;
+  message: string;
+  is_custom_order: boolean;
+  status: 'pending' | 'reviewed' | 'processed';
+  admin_response: string | null;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface DeliveryPartner {
+  id: string;
+  user_id: string;
+  phone: string | null;
+  vehicle_type: string | null;
+  is_active: boolean;
+  current_latitude: number | null;
+  current_longitude: number | null;
+  created_at: string;
+  updated_at: string;
+  profile?: Profile;
 }

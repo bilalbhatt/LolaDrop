@@ -16,8 +16,8 @@ import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet';
 import { useState } from 'react';
 
 export function Header() {
-  const { user, isAdmin, signOut } = useAuth();
-  const { totalItems } = useCart();
+  const { user, isAdmin, isDeliveryPartner, signOut } = useAuth();
+  const { totalItems, isAdding } = useCart();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
 
   return (
@@ -54,10 +54,10 @@ export function Header() {
         <div className="flex items-center gap-2">
           {/* Cart */}
           <Link to="/cart">
-            <Button variant="ghost" size="icon" className="relative">
+            <Button variant="ghost" size="icon" className={`relative ${isAdding ? 'animate-bounce' : ''}`}>
               <ShoppingCart className="h-5 w-5" />
               {totalItems > 0 && (
-                <Badge className="absolute -right-1 -top-1 h-5 w-5 rounded-full p-0 flex items-center justify-center bg-secondary text-secondary-foreground text-xs">
+                <Badge className={`absolute -right-1 -top-1 h-5 w-5 rounded-full p-0 flex items-center justify-center bg-secondary text-secondary-foreground text-xs ${isAdding ? 'animate-ping' : ''}`}>
                   {totalItems}
                 </Badge>
               )}
@@ -79,6 +79,19 @@ export function Header() {
                 <DropdownMenuItem asChild>
                   <Link to="/orders">My Orders</Link>
                 </DropdownMenuItem>
+                <DropdownMenuItem asChild>
+                  <Link to="/feedback">Feedback & Support</Link>
+                </DropdownMenuItem>
+                {isDeliveryPartner && (
+                  <>
+                    <DropdownMenuSeparator />
+                    <DropdownMenuItem asChild>
+                      <Link to="/delivery" className="text-cyan-600 font-medium">
+                        Delivery Portal
+                      </Link>
+                    </DropdownMenuItem>
+                  </>
+                )}
                 {isAdmin && (
                   <>
                     <DropdownMenuSeparator />

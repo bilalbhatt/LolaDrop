@@ -6,6 +6,7 @@ interface AuthContextType {
   user: User | null;
   session: Session | null;
   isAdmin: boolean;
+  isDeliveryPartner: boolean;
   isLoading: boolean;
   signUp: (email: string, password: string, fullName: string) => Promise<{ error: Error | null }>;
   signIn: (email: string, password: string) => Promise<{ error: Error | null }>;
@@ -18,6 +19,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [user, setUser] = useState<User | null>(null);
   const [session, setSession] = useState<Session | null>(null);
   const [isAdmin, setIsAdmin] = useState(false);
+  const [isDeliveryPartner, setIsDeliveryPartner] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
@@ -30,10 +32,11 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         // Defer role check to avoid deadlock
         if (session?.user) {
           setTimeout(() => {
-            checkAdminRole(session.user.id);
+            checkUserRoles(session.user.id);
           }, 0);
         } else {
           setIsAdmin(false);
+          setIsDeliveryPartner(false);
         }
       }
     );
@@ -43,7 +46,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       setSession(session);
       setUser(session?.user ?? null);
       if (session?.user) {
-        checkAdminRole(session.user.id);
+        checkUserRoles(session.user.id);
       }
       setIsLoading(false);
     });
@@ -51,25 +54,27 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     return () => subscription.unsubscribe();
   }, []);
 
-  const checkAdminRole = async (userId: string) => {
+  const checkUserRoles = async (userId: string) => {
     try {
       const { data, error } = await supabase
         .from('user_roles')
         .select('role')
-        .eq('user_id', userId)
-        .eq('role', 'admin')
-        .maybeSingle();
+        .eq('user_id', userId);
 
       if (error) {
-        console.error('Error checking admin role:', error);
+        console.error('Error checking user roles:', error);
         setIsAdmin(false);
+        setIsDeliveryPartner(false);
         return;
       }
       
-      setIsAdmin(!!data);
+      const roles = data?.map(r => r.role) || [];
+      setIsAdmin(roles.includes('admin'));
+      setIsDeliveryPartner(roles.includes('delivery_partner'));
     } catch (err) {
-      console.error('Error in checkAdminRole:', err);
+      console.error('Error in checkUserRoles:', err);
       setIsAdmin(false);
+      setIsDeliveryPartner(false);
     }
   };
 
@@ -102,10 +107,11 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const signOut = async () => {
     await supabase.auth.signOut();
     setIsAdmin(false);
+    setIsDeliveryPartner(false);
   };
 
   return (
-    <AuthContext.Provider value={{ user, session, isAdmin, isLoading, signUp, signIn, signOut }}>
+    <AuthContext.Provider value={{ user, session, isAdmin, isDeliveryPartner, isLoading, signUp, signIn, signOut }}>
       {children}
     </AuthContext.Provider>
   );

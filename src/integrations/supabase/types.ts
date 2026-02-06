@@ -87,6 +87,75 @@ export type Database = {
         }
         Relationships: []
       }
+      delivery_partners: {
+        Row: {
+          created_at: string
+          current_latitude: number | null
+          current_longitude: number | null
+          id: string
+          is_active: boolean | null
+          phone: string | null
+          updated_at: string
+          user_id: string
+          vehicle_type: string | null
+        }
+        Insert: {
+          created_at?: string
+          current_latitude?: number | null
+          current_longitude?: number | null
+          id?: string
+          is_active?: boolean | null
+          phone?: string | null
+          updated_at?: string
+          user_id: string
+          vehicle_type?: string | null
+        }
+        Update: {
+          created_at?: string
+          current_latitude?: number | null
+          current_longitude?: number | null
+          id?: string
+          is_active?: boolean | null
+          phone?: string | null
+          updated_at?: string
+          user_id?: string
+          vehicle_type?: string | null
+        }
+        Relationships: []
+      }
+      feedback: {
+        Row: {
+          admin_response: string | null
+          created_at: string
+          id: string
+          message: string
+          status: string | null
+          type: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          admin_response?: string | null
+          created_at?: string
+          id?: string
+          message: string
+          status?: string | null
+          type?: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          admin_response?: string | null
+          created_at?: string
+          id?: string
+          message?: string
+          status?: string | null
+          type?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       kit_items: {
         Row: {
           created_at: string
@@ -156,6 +225,102 @@ export type Database = {
           is_active?: boolean | null
           name?: string
           updated_at?: string
+        }
+        Relationships: []
+      }
+      order_items: {
+        Row: {
+          created_at: string
+          id: string
+          order_id: string
+          product_id: string
+          quantity: number
+          total_price: number
+          unit_price: number
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          order_id: string
+          product_id: string
+          quantity?: number
+          total_price: number
+          unit_price: number
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          order_id?: string
+          product_id?: string
+          quantity?: number
+          total_price?: number
+          unit_price?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "order_items_order_id_fkey"
+            columns: ["order_id"]
+            isOneToOne: false
+            referencedRelation: "orders"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "order_items_product_id_fkey"
+            columns: ["product_id"]
+            isOneToOne: false
+            referencedRelation: "products"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      orders: {
+        Row: {
+          created_at: string
+          delivery_address: string | null
+          delivery_instructions: string | null
+          delivery_latitude: number | null
+          delivery_longitude: number | null
+          delivery_partner_id: string | null
+          id: string
+          otp_code: string | null
+          payment_method: string | null
+          payment_status: string | null
+          status: string
+          total_amount: number
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          delivery_address?: string | null
+          delivery_instructions?: string | null
+          delivery_latitude?: number | null
+          delivery_longitude?: number | null
+          delivery_partner_id?: string | null
+          id?: string
+          otp_code?: string | null
+          payment_method?: string | null
+          payment_status?: string | null
+          status?: string
+          total_amount?: number
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          delivery_address?: string | null
+          delivery_instructions?: string | null
+          delivery_latitude?: number | null
+          delivery_longitude?: number | null
+          delivery_partner_id?: string | null
+          id?: string
+          otp_code?: string | null
+          payment_method?: string | null
+          payment_status?: string | null
+          status?: string
+          total_amount?: number
+          updated_at?: string
+          user_id?: string
         }
         Relationships: []
       }
@@ -243,6 +408,39 @@ export type Database = {
         }
         Relationships: []
       }
+      user_messages: {
+        Row: {
+          admin_response: string | null
+          created_at: string
+          id: string
+          is_custom_order: boolean | null
+          message: string
+          status: string | null
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          admin_response?: string | null
+          created_at?: string
+          id?: string
+          is_custom_order?: boolean | null
+          message: string
+          status?: string | null
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          admin_response?: string | null
+          created_at?: string
+          id?: string
+          is_custom_order?: boolean | null
+          message?: string
+          status?: string | null
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       user_roles: {
         Row: {
           id: string
@@ -274,6 +472,7 @@ export type Database = {
         Returns: boolean
       }
       is_admin: { Args: never; Returns: boolean }
+      is_delivery_partner: { Args: never; Returns: boolean }
     }
     Enums: {
       app_role: "admin" | "user" | "delivery_partner"
