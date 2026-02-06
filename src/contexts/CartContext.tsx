@@ -8,6 +8,7 @@ interface CartContextType {
   cartItems: CartItem[];
   cartId: string | null;
   isLoading: boolean;
+  isAdding: boolean;
   addToCart: (productId: string, quantity?: number, kitId?: string, isKitItem?: boolean) => Promise<void>;
   addKitToCart: (kit: KitWithItems) => Promise<void>;
   removeFromCart: (itemId: string) => Promise<void>;
@@ -24,6 +25,7 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
   const [cartItems, setCartItems] = useState<CartItem[]>([]);
   const [cartId, setCartId] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(false);
+  const [isAdding, setIsAdding] = useState(false);
 
   useEffect(() => {
     if (user) {
@@ -76,6 +78,7 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
       return;
     }
 
+    setIsAdding(true);
     try {
       // Check if item already exists
       const existingItem = cartItems.find(
@@ -97,11 +100,16 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
 
         if (error) throw error;
         await fetchCart();
-        toast.success('Added to cart!');
+        toast.success('Added to cart!', {
+          icon: '🛒',
+          duration: 1500,
+        });
       }
     } catch (error) {
       console.error('Error adding to cart:', error);
       toast.error('Failed to add to cart');
+    } finally {
+      setTimeout(() => setIsAdding(false), 300);
     }
   };
 
@@ -111,6 +119,7 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
       return;
     }
 
+    setIsAdding(true);
     try {
       // Add all kit items at once
       const kitItems = kit.kit_items.map(item => ({
@@ -127,10 +136,15 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
 
       if (error) throw error;
       await fetchCart();
-      toast.success(`${kit.name} added to cart!`);
+      toast.success(`${kit.name} added to cart!`, {
+        icon: '📦',
+        duration: 1500,
+      });
     } catch (error) {
       console.error('Error adding kit to cart:', error);
       toast.error('Failed to add kit to cart');
+    } finally {
+      setTimeout(() => setIsAdding(false), 300);
     }
   };
 
@@ -218,6 +232,7 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
         cartItems,
         cartId,
         isLoading,
+        isAdding,
         addToCart,
         addKitToCart,
         removeFromCart,

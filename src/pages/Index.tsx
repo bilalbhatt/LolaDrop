@@ -106,12 +106,12 @@ const Index = () => {
         {/* CTA Section */}
         <section className="py-16 bg-gradient-orange">
           <div className="container text-center">
-            <h2 className="font-display text-3xl md:text-4xl font-bold text-secondary-foreground mb-4">
-              Ready to Save Time & Money?
-            </h2>
-            <p className="text-secondary-foreground/80 text-lg mb-8 max-w-2xl mx-auto">
-              Join thousands of families who trust LolaKart for their daily essentials. 
-              Same day delivery, every day!
+          <h2 className="font-display text-3xl md:text-4xl font-bold text-secondary-foreground mb-4">
+            Ready to Save Time & Money?
+          </h2>
+          <p className="text-secondary-foreground/80 text-lg mb-8 max-w-2xl mx-auto">
+            Join thousands of families who trust LolaDrop for their daily essentials. 
+            Same day delivery, every day!
             </p>
             <Link to="/auth">
               <Button size="lg" className="bg-foreground text-background hover:bg-foreground/90 font-semibold">
