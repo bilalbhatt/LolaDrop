@@ -24,6 +24,11 @@ export function ProductCard({ product }: ProductCardProps) {
     setTimeout(() => setLocalAdding(false), 500);
   };
 
+  const hasDiscount = product.discount_percentage && product.discount_percentage > 0;
+  const savingsAmount = hasDiscount && product.original_price
+    ? (Number(product.original_price) - Number(product.price)).toFixed(0)
+    : null;
+
   return (
     <Card className={`group overflow-hidden border hover:border-primary/30 transition-all duration-300 hover:shadow-card ${localAdding ? 'animate-pulse ring-2 ring-primary' : ''}`}>
       <CardContent className="p-0">
@@ -33,6 +38,7 @@ export function ProductCard({ product }: ProductCardProps) {
               src={product.image_url} 
               alt={product.name}
               className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+              loading="lazy"
             />
           ) : (
             <ShoppingBag className="h-12 w-12 text-muted-foreground/40" />
@@ -42,6 +48,15 @@ export function ProductCard({ product }: ProductCardProps) {
               <Badge variant="destructive">Out of Stock</Badge>
             </div>
           )}
+
+          {/* Discount Badge - Top Right */}
+          {hasDiscount && (
+            <Badge className="absolute top-2 right-2 bg-green-600 text-white text-xs font-bold">
+              {product.discount_percentage}% OFF
+            </Badge>
+          )}
+
+          {/* Category Badge */}
           {product.category && (
             <Badge 
               variant="secondary" 
@@ -66,26 +81,23 @@ export function ProductCard({ product }: ProductCardProps) {
             {product.name}
           </h3>
           
-          <div className="flex items-baseline gap-1 flex-wrap">
-            <div className="flex items-center gap-2">
+          <div className="space-y-1">
+            <div className="flex items-baseline gap-2">
               <span className="font-display text-lg font-bold text-primary">
                 ₹{Number(product.price).toFixed(0)}
               </span>
-              {product.discount_percentage && product.discount_percentage > 0 && (
-                <>
-                  {product.original_price && (
-                    <span className="text-sm text-muted-foreground line-through">
-                      ₹{Number(product.original_price).toFixed(0)}
-                    </span>
-                  )}
-                  <Badge variant="secondary" className="bg-secondary/20 text-secondary-foreground text-xs">
-                    <Percent className="h-3 w-3 mr-0.5" />
-                    {product.discount_percentage}% OFF
-                  </Badge>
-                </>
+              {hasDiscount && product.original_price && (
+                <span className="text-xs text-muted-foreground line-through">
+                  MRP ₹{Number(product.original_price).toFixed(0)}
+                </span>
               )}
+              <span className="text-xs text-muted-foreground">/{product.unit}</span>
             </div>
-            <span className="text-xs text-muted-foreground">/{product.unit}</span>
+            {savingsAmount && Number(savingsAmount) > 0 && (
+              <p className="text-xs text-green-600 font-medium">
+                You save ₹{savingsAmount}
+              </p>
+            )}
           </div>
         </div>
       </CardContent>

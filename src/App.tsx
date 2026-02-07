@@ -17,6 +17,8 @@ import DeliveryPartnerPortal from "./pages/DeliveryPartnerPortal";
 import FeedbackPage from "./pages/FeedbackPage";
 import OrdersPage from "./pages/OrdersPage";
 import Checkout from "./pages/Checkout";
+import ProfilePage from "./pages/ProfilePage";
+import AboutPage from "./pages/AboutPage";
 
 const queryClient = new QueryClient();
 
@@ -39,8 +41,8 @@ const App = () => (
               <Route path="/delivery" element={<DeliveryPartnerPortal />} />
               <Route path="/orders" element={<OrdersPage />} />
               <Route path="/feedback" element={<FeedbackPage />} />
-              <Route path="/profile" element={<ComingSoon />} />
-              <Route path="/about" element={<ComingSoon />} />
+              <Route path="/profile" element={<ProfilePage />} />
+              <Route path="/about" element={<AboutPage />} />
               <Route path="/faq" element={<ComingSoon />} />
               <Route path="/shipping" element={<ComingSoon />} />
               <Route path="/returns" element={<ComingSoon />} />

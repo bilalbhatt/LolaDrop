@@ -1,6 +1,9 @@
 import { Header } from '@/components/layout/Header';
 import { Footer } from '@/components/layout/Footer';
 import { HeroBanner } from '@/components/home/HeroBanner';
+import { CategoryBar } from '@/components/home/CategoryBar';
+import { PromoBanner } from '@/components/home/PromoBanner';
+import { MakeYourOrder } from '@/components/home/MakeYourOrder';
 import { KitCard } from '@/components/kits/KitCard';
 import { ProductCard } from '@/components/products/ProductCard';
 import { useKits } from '@/hooks/useKits';
@@ -17,6 +20,8 @@ const Index = () => {
   return (
     <div className="min-h-screen flex flex-col">
       <Header />
+      <PromoBanner />
+      <CategoryBar />
       
       <main className="flex-1">
         <HeroBanner />
@@ -103,15 +108,18 @@ const Index = () => {
           </div>
         </section>
 
+        {/* Make Your Own Order */}
+        <MakeYourOrder />
+
         {/* CTA Section */}
         <section className="py-16 bg-gradient-orange">
           <div className="container text-center">
-          <h2 className="font-display text-3xl md:text-4xl font-bold text-secondary-foreground mb-4">
-            Ready to Save Time & Money?
-          </h2>
-          <p className="text-secondary-foreground/80 text-lg mb-8 max-w-2xl mx-auto">
-            Join thousands of families who trust LolaDrop for their daily essentials. 
-            Same day delivery, every day!
+            <h2 className="font-display text-3xl md:text-4xl font-bold text-secondary-foreground mb-4">
+              Ready to Save Time & Money?
+            </h2>
+            <p className="text-secondary-foreground/80 text-lg mb-8 max-w-2xl mx-auto">
+              Join thousands of families who trust LolaDrop for their daily essentials. 
+              Same day delivery, every day!
             </p>
             <Link to="/auth">
               <Button size="lg" className="bg-foreground text-background hover:bg-foreground/90 font-semibold">

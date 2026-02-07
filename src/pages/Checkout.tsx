@@ -15,7 +15,8 @@ import { LocationPicker } from '@/components/location/LocationPicker';
 import { useCreateOrder } from '@/hooks/useOrders';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
-import { IndianRupee, CreditCard, Banknote, Copy, CheckCircle } from 'lucide-react';
+import { IndianRupee, CreditCard, Banknote, Copy, CheckCircle, AlertTriangle } from 'lucide-react';
+import { DELIVERY_CHARGE, FREE_DELIVERY_THRESHOLD, MIN_ORDER_AMOUNT } from '@/lib/types';
 
 const UPI_ID = '9622927445@pthdfc';
 
@@ -42,6 +43,10 @@ export default function Checkout() {
     return null;
   }
 
+  const deliveryCharge = totalPrice >= FREE_DELIVERY_THRESHOLD ? 0 : DELIVERY_CHARGE;
+  const finalTotal = totalPrice + deliveryCharge;
+  const isBelowMinimum = totalPrice < MIN_ORDER_AMOUNT;
+
   const handleLocationDetected = (lat: number, lng: number, address: string) => {
     setLatitude(lat);
     setLongitude(lng);
@@ -56,6 +61,11 @@ export default function Checkout() {
   };
 
   const handlePlaceOrder = async () => {
+    if (isBelowMinimum) {
+      toast.error(`Minimum order amount is ₹${MIN_ORDER_AMOUNT}`);
+      return;
+    }
+
     if (!deliveryAddress.trim()) {
       toast.error('Please enter delivery address');
       return;
@@ -70,6 +80,7 @@ export default function Checkout() {
         deliveryLongitude: longitude,
         deliveryInstructions,
         paymentMethod,
+        deliveryCharge,
         items: cartItems.map(item => ({
           productId: item.product_id,
           quantity: item.quantity,
@@ -77,7 +88,6 @@ export default function Checkout() {
         })),
       });
 
-      // Clear cart after successful order
       await supabase
         .from('cart_items')
         .delete()
@@ -98,6 +108,16 @@ export default function Checkout() {
           <h1 className="font-display text-2xl md:text-3xl font-bold text-foreground mb-6">
             Checkout
           </h1>
+
+          {/* Minimum Order Warning */}
+          {isBelowMinimum && (
+            <div className="mb-6 p-4 bg-destructive/10 border border-destructive/30 rounded-lg flex items-center gap-3">
+              <AlertTriangle className="h-5 w-5 text-destructive flex-shrink-0" />
+              <p className="text-sm text-destructive">
+                Minimum order amount is <strong>₹{MIN_ORDER_AMOUNT}</strong>. Please add ₹{(MIN_ORDER_AMOUNT - totalPrice).toFixed(0)} more to proceed.
+              </p>
+            </div>
+          )}
 
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
             {/* Delivery & Payment */}
@@ -215,11 +235,33 @@ export default function Checkout() {
 
                   <Separator />
 
+                  <div className="space-y-2">
+                    <div className="flex justify-between text-sm">
+                      <span className="text-muted-foreground">Subtotal</span>
+                      <span>₹{totalPrice.toLocaleString()}</span>
+                    </div>
+                    <div className="flex justify-between text-sm">
+                      <span className="text-muted-foreground">Delivery</span>
+                      {deliveryCharge === 0 ? (
+                        <span className="text-primary font-medium">FREE</span>
+                      ) : (
+                        <span>₹{deliveryCharge}</span>
+                      )}
+                    </div>
+                    {deliveryCharge > 0 && (
+                      <p className="text-xs text-muted-foreground">
+                        Add ₹{(FREE_DELIVERY_THRESHOLD - totalPrice).toFixed(0)} more for free delivery
+                      </p>
+                    )}
+                  </div>
+
+                  <Separator />
+
                   <div className="flex justify-between font-semibold text-lg">
                     <span>Total</span>
                     <span className="flex items-center gap-1">
                       <IndianRupee className="h-4 w-4" />
-                      {totalPrice.toLocaleString()}
+                      {finalTotal.toLocaleString()}
                     </span>
                   </div>
 
@@ -227,9 +269,9 @@ export default function Checkout() {
                     className="w-full" 
                     size="lg"
                     onClick={handlePlaceOrder}
-                    disabled={createOrder.isPending}
+                    disabled={createOrder.isPending || isBelowMinimum}
                   >
-                    {createOrder.isPending ? 'Placing Order...' : 'Place Order'}
+                    {createOrder.isPending ? 'Placing Order...' : `Place Order — ₹${finalTotal.toLocaleString()}`}
                   </Button>
 
                   <p className="text-xs text-center text-muted-foreground">

@@ -1,7 +1,8 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
-import { Order, OrderItem } from '@/lib/types';
+import { Order } from '@/lib/types';
 import { toast } from 'sonner';
+import { DELIVERY_CHARGE, FREE_DELIVERY_THRESHOLD } from '@/lib/types';
 
 export function useOrders() {
   return useQuery({
@@ -29,6 +30,8 @@ export function useUserOrders(userId: string | undefined) {
     queryKey: ['orders', userId],
     queryFn: async () => {
       if (!userId) return [];
+
+      // Fetch orders with items
       const { data, error } = await supabase
         .from('orders')
         .select(`
@@ -42,7 +45,35 @@ export function useUserOrders(userId: string | undefined) {
         .order('created_at', { ascending: false });
 
       if (error) throw error;
-      return data as Order[];
+
+      // For orders with delivery partner, fetch partner info
+      const ordersWithPartners = await Promise.all(
+        (data || []).map(async (order) => {
+          if (order.delivery_partner_id) {
+            const { data: partner } = await supabase
+              .from('delivery_partners')
+              .select('*')
+              .eq('user_id', order.delivery_partner_id)
+              .maybeSingle();
+
+            if (partner) {
+              const { data: partnerProfile } = await supabase
+                .from('profiles')
+                .select('*')
+                .eq('user_id', partner.user_id)
+                .maybeSingle();
+
+              return {
+                ...order,
+                delivery_partner: { ...partner, profile: partnerProfile },
+              };
+            }
+          }
+          return order;
+        })
+      );
+
+      return ordersWithPartners as Order[];
     },
     enabled: !!userId,
   });
@@ -66,7 +97,21 @@ export function useDeliveryPartnerOrders(partnerId: string | undefined) {
         .order('created_at', { ascending: false });
 
       if (error) throw error;
-      return data as Order[];
+
+      // Fetch customer profiles
+      const ordersWithProfiles = await Promise.all(
+        (data || []).map(async (order) => {
+          const { data: profile } = await supabase
+            .from('profiles')
+            .select('*')
+            .eq('user_id', order.user_id)
+            .maybeSingle();
+
+          return { ...order, profile };
+        })
+      );
+
+      return ordersWithProfiles as Order[];
     },
     enabled: !!partnerId,
   });
@@ -101,16 +146,65 @@ export function useAssignDeliveryPartner() {
 
   return useMutation({
     mutationFn: async ({ orderId, partnerId }: { orderId: string; partnerId: string }) => {
+      // Get order details for notification
+      const { data: order, error: orderFetchError } = await supabase
+        .from('orders')
+        .select(`
+          *,
+          order_items:order_items(*, product:products(*))
+        `)
+        .eq('id', orderId)
+        .single();
+
+      if (orderFetchError) throw orderFetchError;
+
+      // Get customer profile
+      const { data: customerProfile } = await supabase
+        .from('profiles')
+        .select('*')
+        .eq('user_id', order.user_id)
+        .maybeSingle();
+
+      // Update order
       const { error } = await supabase
         .from('orders')
         .update({ delivery_partner_id: partnerId, updated_at: new Date().toISOString() })
         .eq('id', orderId);
 
       if (error) throw error;
+
+      // Create notification for delivery partner
+      const itemsList = (order as any).order_items
+        ?.map((item: any) => `${item.product?.name} × ${item.quantity}`)
+        .join(', ') || 'No items';
+
+      const message = [
+        `📦 New order assigned!`,
+        `📍 Address: ${order.delivery_address || 'Not specified'}`,
+        `👤 Customer: ${customerProfile?.full_name || 'N/A'}`,
+        `📞 Phone: ${customerProfile?.phone || 'Not provided'}`,
+        `🛒 Items: ${itemsList}`,
+        `💰 Amount: ₹${Number(order.total_amount).toLocaleString()} (${(order.payment_method || 'cod').toUpperCase()})`,
+      ].join('\n');
+
+      await supabase.from('notifications').insert({
+        user_id: partnerId,
+        title: `New Delivery: Order #${orderId.slice(0, 8)}`,
+        message,
+        order_id: orderId,
+      });
+
+      // Also notify the customer
+      await supabase.from('notifications').insert({
+        user_id: order.user_id,
+        title: 'Delivery Partner Assigned',
+        message: `A delivery partner has been assigned to your order #${orderId.slice(0, 8)}. Your order is on its way!`,
+        order_id: orderId,
+      });
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['orders'] });
-      toast.success('Delivery partner assigned');
+      toast.success('Delivery partner assigned & notified');
     },
     onError: (error) => {
       console.error('Error assigning delivery partner:', error);
@@ -131,17 +225,17 @@ export function useCreateOrder() {
       deliveryLongitude?: number;
       deliveryInstructions?: string;
       paymentMethod: 'cod' | 'upi';
+      deliveryCharge: number;
       items: { productId: string; quantity: number; unitPrice: number }[];
     }) => {
-      // Generate 4-digit OTP
       const otpCode = Math.floor(1000 + Math.random() * 9000).toString();
+      const finalAmount = orderData.totalAmount + orderData.deliveryCharge;
 
-      // Create order
       const { data: order, error: orderError } = await supabase
         .from('orders')
         .insert({
           user_id: orderData.userId,
-          total_amount: orderData.totalAmount,
+          total_amount: finalAmount,
           delivery_address: orderData.deliveryAddress,
           delivery_latitude: orderData.deliveryLatitude,
           delivery_longitude: orderData.deliveryLongitude,
@@ -154,7 +248,6 @@ export function useCreateOrder() {
 
       if (orderError) throw orderError;
 
-      // Create order items
       const orderItems = orderData.items.map(item => ({
         order_id: order.id,
         product_id: item.productId,
@@ -201,10 +294,10 @@ export function useVerifyDeliveryOTP() {
 
       const { error: updateError } = await supabase
         .from('orders')
-        .update({ 
-          status: 'delivered', 
+        .update({
+          status: 'delivered',
           payment_status: 'completed',
-          updated_at: new Date().toISOString() 
+          updated_at: new Date().toISOString(),
         })
         .eq('id', orderId);
 

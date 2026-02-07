@@ -4,7 +4,7 @@ import { Header } from '@/components/layout/Header';
 import { Footer } from '@/components/layout/Footer';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Badge } from '@/components/ui/badge';
-import { Package, ShoppingBag, Users, LayoutDashboard, ClipboardList, Truck, MessageSquare, MessageCircle } from 'lucide-react';
+import { Package, ShoppingBag, Users, LayoutDashboard, ClipboardList, Truck, MessageSquare, MessageCircle, Tag } from 'lucide-react';
 import { ProductsTab } from '@/components/admin/ProductsTab';
 import { KitsTab } from '@/components/admin/KitsTab';
 import { UsersTab } from '@/components/admin/UsersTab';
@@ -13,6 +13,7 @@ import { OrdersTab } from '@/components/admin/OrdersTab';
 import { DeliveryPartnersTab } from '@/components/admin/DeliveryPartnersTab';
 import { FeedbackTab } from '@/components/admin/FeedbackTab';
 import { MessagesTab } from '@/components/admin/MessagesTab';
+import { PromotionsTab } from '@/components/admin/PromotionsTab';
 import { useEffect } from 'react';
 
 export default function Admin() {
@@ -83,6 +84,10 @@ export default function Admin() {
                 <MessageCircle className="h-4 w-4" />
                 <span className="hidden sm:inline">Messages</span>
               </TabsTrigger>
+              <TabsTrigger value="promotions" className="gap-2">
+                <Tag className="h-4 w-4" />
+                <span className="hidden sm:inline">Promotions</span>
+              </TabsTrigger>
             </TabsList>
 
             <TabsContent value="dashboard">
@@ -115,6 +120,10 @@ export default function Admin() {
 
             <TabsContent value="messages">
               <MessagesTab />
+            </TabsContent>
+
+            <TabsContent value="promotions">
+              <PromotionsTab />
             </TabsContent>
           </Tabs>
         </div>
