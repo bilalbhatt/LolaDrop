@@ -143,3 +143,30 @@ export interface DeliveryPartner {
   updated_at: string;
   profile?: Profile;
 }
+
+export interface Notification {
+  id: string;
+  user_id: string;
+  title: string;
+  message: string;
+  is_read: boolean;
+  order_id: string | null;
+  created_at: string;
+}
+
+export interface Promotion {
+  id: string;
+  title: string;
+  description: string | null;
+  discount_percentage: number;
+  banner_image_url: string | null;
+  is_active: boolean;
+  start_date: string | null;
+  end_date: string | null;
+  created_at: string;
+  updated_at: string;
+}
+
+export const DELIVERY_CHARGE = 30;
+export const FREE_DELIVERY_THRESHOLD = 550;
+export const MIN_ORDER_AMOUNT = 300;

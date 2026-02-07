@@ -17,8 +17,8 @@ import {
 } from '@/hooks/useFeedback';
 import { Feedback, UserMessage } from '@/lib/types';
 import { format } from 'date-fns';
-import { MessageSquare, Send, ShoppingCart, Plus } from 'lucide-react';
-import { Navigate } from 'react-router-dom';
+import { MessageSquare, Send, ShoppingBag, Plus } from 'lucide-react';
+import { Navigate, useSearchParams } from 'react-router-dom';
 
 const typeColors: Record<string, string> = {
   feedback: 'bg-blue-100 text-blue-800',
@@ -35,6 +35,8 @@ const statusColors: Record<string, string> = {
 
 export default function FeedbackPage() {
   const { user, isLoading: authLoading } = useAuth();
+  const [searchParams] = useSearchParams();
+  const defaultTab = searchParams.get('tab') || 'feedback';
   const { data: feedback } = useUserFeedback(user?.id);
   const { data: messages } = useMyMessages(user?.id);
   const createFeedback = useCreateFeedback();
@@ -43,7 +45,7 @@ export default function FeedbackPage() {
   const [feedbackType, setFeedbackType] = useState<Feedback['type']>('feedback');
   const [feedbackText, setFeedbackText] = useState('');
   const [messageText, setMessageText] = useState('');
-  const [isCustomOrder, setIsCustomOrder] = useState(false);
+  const [isCustomOrder, setIsCustomOrder] = useState(defaultTab === 'messages');
 
   if (authLoading) {
     return <div className="min-h-screen flex items-center justify-center">Loading...</div>;
@@ -84,15 +86,15 @@ export default function FeedbackPage() {
             Feedback & Support
           </h1>
 
-          <Tabs defaultValue="feedback" className="space-y-6">
+          <Tabs defaultValue={defaultTab} className="space-y-6">
             <TabsList className="grid w-full grid-cols-2 max-w-md">
               <TabsTrigger value="feedback" className="gap-2">
                 <MessageSquare className="h-4 w-4" />
                 Feedback
               </TabsTrigger>
               <TabsTrigger value="messages" className="gap-2">
-                <ShoppingCart className="h-4 w-4" />
-                Custom Orders
+                <ShoppingBag className="h-4 w-4" />
+                Make Your Own Order
               </TabsTrigger>
             </TabsList>
 
@@ -182,9 +184,13 @@ export default function FeedbackPage() {
               {/* Submit Custom Order/Message */}
               <Card>
                 <CardHeader>
-                  <CardTitle className="text-lg">Send a Message or Custom Order</CardTitle>
+                  <CardTitle className="text-lg">Make Your Own Order</CardTitle>
                 </CardHeader>
                 <CardContent className="space-y-4">
+                  <p className="text-sm text-muted-foreground">
+                    Can't find what you need? Describe your order below and we'll get it for you!
+                  </p>
+
                   <div className="flex items-center gap-2">
                     <input
                       type="checkbox"
@@ -200,7 +206,7 @@ export default function FeedbackPage() {
                     <Label>Message</Label>
                     <Textarea
                       placeholder={isCustomOrder 
-                        ? "Describe what you'd like to order..."
+                        ? "Describe what you'd like to order (items, quantities, brands preferred)..."
                         : "Write your message here..."
                       }
                       value={messageText}
@@ -215,16 +221,16 @@ export default function FeedbackPage() {
                     className="gap-2"
                   >
                     <Send className="h-4 w-4" />
-                    {createMessage.isPending ? 'Sending...' : 'Send Message'}
+                    {createMessage.isPending ? 'Sending...' : 'Send Request'}
                   </Button>
                 </CardContent>
               </Card>
 
               {/* Previous Messages */}
               <div className="space-y-4">
-                <h3 className="font-semibold">Your Messages</h3>
+                <h3 className="font-semibold">Your Requests</h3>
                 {!messages?.length ? (
-                  <p className="text-muted-foreground text-sm">No messages sent yet</p>
+                  <p className="text-muted-foreground text-sm">No requests sent yet</p>
                 ) : (
                   messages.map((item) => (
                     <Card key={item.id}>
@@ -233,7 +239,7 @@ export default function FeedbackPage() {
                           <div className="flex items-center gap-2">
                             {item.is_custom_order && (
                               <Badge className="bg-purple-100 text-purple-800">
-                                <ShoppingCart className="h-3 w-3 mr-1" />
+                                <ShoppingBag className="h-3 w-3 mr-1" />
                                 Custom Order
                               </Badge>
                             )}

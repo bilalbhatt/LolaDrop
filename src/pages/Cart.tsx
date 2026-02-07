@@ -5,13 +5,21 @@ import { useAuth } from '@/contexts/AuthContext';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Separator } from '@/components/ui/separator';
-import { ShoppingCart, Trash2, Plus, Minus, Lock, Package, ArrowRight } from 'lucide-react';
+import { Progress } from '@/components/ui/progress';
+import { ShoppingCart, Trash2, Plus, Minus, Lock, Package, ArrowRight, Truck } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { LocationPicker } from '@/components/location/LocationPicker';
+import { DELIVERY_CHARGE, FREE_DELIVERY_THRESHOLD, MIN_ORDER_AMOUNT } from '@/lib/types';
 
 export default function Cart() {
   const { user } = useAuth();
   const { cartItems, totalItems, totalPrice, updateQuantity, removeFromCart, isLoading } = useCart();
+
+  const deliveryCharge = totalPrice >= FREE_DELIVERY_THRESHOLD ? 0 : DELIVERY_CHARGE;
+  const finalTotal = totalPrice + deliveryCharge;
+  const freeDeliveryProgress = Math.min((totalPrice / FREE_DELIVERY_THRESHOLD) * 100, 100);
+  const amountToFreeDelivery = Math.max(FREE_DELIVERY_THRESHOLD - totalPrice, 0);
+  const amountToMinOrder = Math.max(MIN_ORDER_AMOUNT - totalPrice, 0);
 
   if (!user) {
     return (
@@ -74,7 +82,6 @@ export default function Cart() {
                   <Card key={item.id} className="overflow-hidden">
                     <CardContent className="p-4">
                       <div className="flex gap-4">
-                        {/* Product Image */}
                         <div className="w-20 h-20 rounded-lg bg-muted flex items-center justify-center flex-shrink-0">
                           {item.product?.image_url ? (
                             <img 
@@ -87,16 +94,23 @@ export default function Cart() {
                           )}
                         </div>
 
-                        {/* Product Details */}
                         <div className="flex-1 min-w-0">
                           <div className="flex items-start justify-between">
                             <div>
                               <h3 className="font-medium text-foreground line-clamp-1">
                                 {item.product?.name}
                               </h3>
-                              <p className="text-sm text-muted-foreground">
-                                ₹{Number(item.product?.price || 0).toFixed(0)} / {item.product?.unit}
-                              </p>
+                              <div className="flex items-center gap-2 text-sm">
+                                <span className="text-primary font-semibold">
+                                  ₹{Number(item.product?.price || 0).toFixed(0)}
+                                </span>
+                                {item.product?.original_price && item.product.original_price > item.product.price && (
+                                  <span className="text-muted-foreground line-through text-xs">
+                                    ₹{Number(item.product.original_price).toFixed(0)}
+                                  </span>
+                                )}
+                                <span className="text-muted-foreground">/ {item.product?.unit}</span>
+                              </div>
                               {item.is_kit_item && (
                                 <span className="inline-flex items-center gap-1 text-xs text-primary mt-1">
                                   <Lock className="h-3 w-3" /> Kit item (minimum)
@@ -108,7 +122,6 @@ export default function Cart() {
                             </p>
                           </div>
 
-                          {/* Quantity Controls */}
                           <div className="flex items-center justify-between mt-3">
                             <div className="flex items-center gap-2">
                               <Button
@@ -152,7 +165,6 @@ export default function Cart() {
 
               {/* Order Summary */}
               <div>
-                {/* Location Picker */}
                 <div className="mb-6">
                   <LocationPicker />
                 </div>
@@ -162,23 +174,51 @@ export default function Cart() {
                     <CardTitle className="font-display">Order Summary</CardTitle>
                   </CardHeader>
                   <CardContent className="space-y-4">
+                    {/* Free Delivery Progress */}
+                    {totalPrice < FREE_DELIVERY_THRESHOLD && (
+                      <div className="space-y-2">
+                        <div className="flex items-center gap-2 text-sm">
+                          <Truck className="h-4 w-4 text-primary" />
+                          <span className="text-muted-foreground">
+                            Add ₹{amountToFreeDelivery.toFixed(0)} more for <strong className="text-primary">FREE delivery</strong>
+                          </span>
+                        </div>
+                        <Progress value={freeDeliveryProgress} className="h-2" />
+                      </div>
+                    )}
+
+                    {/* Minimum Order Warning */}
+                    {totalPrice < MIN_ORDER_AMOUNT && (
+                      <div className="text-sm text-destructive bg-destructive/10 p-2 rounded">
+                        Minimum order: ₹{MIN_ORDER_AMOUNT}. Add ₹{amountToMinOrder.toFixed(0)} more.
+                      </div>
+                    )}
+
                     <div className="flex justify-between text-sm">
                       <span className="text-muted-foreground">Items ({totalItems})</span>
                       <span>₹{totalPrice.toFixed(0)}</span>
                     </div>
                     <div className="flex justify-between text-sm">
                       <span className="text-muted-foreground">Delivery</span>
-                      <span className="text-primary font-medium">FREE</span>
+                      {deliveryCharge === 0 ? (
+                        <span className="text-primary font-medium">FREE</span>
+                      ) : (
+                        <span>₹{deliveryCharge}</span>
+                      )}
                     </div>
                     <Separator />
                     <div className="flex justify-between font-display font-semibold text-lg">
                       <span>Total</span>
-                      <span className="text-primary">₹{totalPrice.toFixed(0)}</span>
+                      <span className="text-primary">₹{finalTotal.toFixed(0)}</span>
                     </div>
                   </CardContent>
                   <CardFooter>
                     <Link to="/checkout" className="w-full">
-                      <Button className="w-full bg-gradient-hero hover:opacity-90" size="lg">
+                      <Button
+                        className="w-full bg-gradient-hero hover:opacity-90"
+                        size="lg"
+                        disabled={totalPrice < MIN_ORDER_AMOUNT}
+                      >
                         Proceed to Checkout
                         <ArrowRight className="h-4 w-4 ml-2" />
                       </Button>
