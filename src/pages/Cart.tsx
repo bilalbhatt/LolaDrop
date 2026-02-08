@@ -76,7 +76,7 @@ export default function Cart() {
             </Card>
           ) : (
             <div className="grid lg:grid-cols-3 gap-6">
-              {/* Cart Items */}
+              {/* Cart Items - ALL items shown */}
               <div className="lg:col-span-2 space-y-4">
                 {cartItems.map((item) => (
                   <Card key={item.id} className="overflow-hidden">
@@ -104,7 +104,7 @@ export default function Cart() {
                                 <span className="text-primary font-semibold">
                                   ₹{Number(item.product?.price || 0).toFixed(0)}
                                 </span>
-                                {item.product?.original_price && item.product.original_price > item.product.price && (
+                                {item.product?.original_price && Number(item.product.original_price) > Number(item.product.price) && (
                                   <span className="text-muted-foreground line-through text-xs">
                                     ₹{Number(item.product.original_price).toFixed(0)}
                                   </span>
@@ -113,7 +113,7 @@ export default function Cart() {
                               </div>
                               {item.is_kit_item && (
                                 <span className="inline-flex items-center gap-1 text-xs text-primary mt-1">
-                                  <Lock className="h-3 w-3" /> Kit item (minimum)
+                                  <Lock className="h-3 w-3" /> Kit item
                                 </span>
                               )}
                             </div>
@@ -129,7 +129,7 @@ export default function Cart() {
                                 size="icon"
                                 className="h-8 w-8"
                                 onClick={() => updateQuantity(item.id, item.quantity - 1)}
-                                disabled={item.quantity <= 1 || item.is_kit_item}
+                                disabled={item.quantity <= 1}
                               >
                                 <Minus className="h-4 w-4" />
                               </Button>
@@ -144,17 +144,15 @@ export default function Cart() {
                               </Button>
                             </div>
                             
-                            {!item.is_kit_item && (
-                              <Button
-                                variant="ghost"
-                                size="sm"
-                                className="text-destructive hover:text-destructive"
-                                onClick={() => removeFromCart(item.id)}
-                              >
-                                <Trash2 className="h-4 w-4 mr-1" />
-                                Remove
-                              </Button>
-                            )}
+                            <Button
+                              variant="ghost"
+                              size="sm"
+                              className="text-destructive hover:text-destructive"
+                              onClick={() => removeFromCart(item.id)}
+                            >
+                              <Trash2 className="h-4 w-4 mr-1" />
+                              Remove
+                            </Button>
                           </div>
                         </div>
                       </div>

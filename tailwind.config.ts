@@ -16,6 +16,7 @@ export default {
       fontFamily: {
         sans: ['Inter', 'sans-serif'],
         display: ['Poppins', 'sans-serif'],
+        promo: ['Fredoka', 'sans-serif'],
       },
       colors: {
         border: "hsl(var(--border))",

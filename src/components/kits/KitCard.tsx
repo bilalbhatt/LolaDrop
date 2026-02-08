@@ -1,4 +1,4 @@
-import { Package, Plus, Lock } from 'lucide-react';
+import { Package, Plus, Lock, Percent } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Card, CardContent, CardFooter, CardHeader } from '@/components/ui/card';
@@ -16,11 +16,19 @@ export function KitCard({ kit }: KitCardProps) {
   const { user } = useAuth();
 
   const handleAddToCart = () => {
-    if (!user) {
-      return;
-    }
+    if (!user) return;
     addKitToCart(kit);
   };
+
+  // Calculate pricing
+  const originalTotal = kit.kit_items.reduce((sum, item) => {
+    const originalPrice = item.product?.original_price || item.product?.price || 0;
+    return sum + (Number(originalPrice) * item.quantity);
+  }, 0);
+
+  const offeredTotal = kit.total_price;
+  const savings = originalTotal - offeredTotal;
+  const discountPercent = originalTotal > 0 ? Math.round((savings / originalTotal) * 100) : 0;
 
   return (
     <Card className="group overflow-hidden border-2 hover:border-primary/50 transition-all duration-300 hover:shadow-hover">
@@ -38,6 +46,12 @@ export function KitCard({ kit }: KitCardProps) {
           <Badge className="absolute top-3 right-3 bg-secondary text-secondary-foreground">
             {kit.kit_items.length} items
           </Badge>
+          {discountPercent > 0 && (
+            <Badge className="absolute top-3 left-3 bg-green-600 text-white font-bold gap-1">
+              <Percent className="h-3 w-3" />
+              {discountPercent}% OFF
+            </Badge>
+          )}
         </div>
       </CardHeader>
 
@@ -53,14 +67,14 @@ export function KitCard({ kit }: KitCardProps) {
           )}
         </div>
 
-        {/* Kit Items Preview */}
+        {/* Kit Items - Show All */}
         <div className="space-y-2">
           <div className="flex items-center gap-1 text-xs text-muted-foreground">
             <Lock className="h-3 w-3" />
-            <span>Minimum items (can't remove)</span>
+            <span>Kit items included</span>
           </div>
           <div className="flex flex-wrap gap-1">
-            {kit.kit_items.slice(0, 4).map((item) => (
+            {kit.kit_items.map((item) => (
               <Badge 
                 key={item.id} 
                 variant="secondary" 
@@ -69,20 +83,26 @@ export function KitCard({ kit }: KitCardProps) {
                 {item.product?.name} × {item.quantity}
               </Badge>
             ))}
-            {kit.kit_items.length > 4 && (
-              <Badge variant="outline" className="text-xs">
-                +{kit.kit_items.length - 4} more
-              </Badge>
-            )}
           </div>
         </div>
 
-        {/* Price */}
-        <div className="flex items-baseline gap-2">
-          <span className="font-display text-2xl font-bold text-primary">
-            ₹{kit.total_price.toFixed(0)}
-          </span>
-          <span className="text-sm text-muted-foreground">total</span>
+        {/* Pricing */}
+        <div className="space-y-1">
+          <div className="flex items-baseline gap-2">
+            <span className="font-display text-2xl font-bold text-primary">
+              ₹{offeredTotal.toFixed(0)}
+            </span>
+            {savings > 0 && (
+              <span className="text-sm text-muted-foreground line-through">
+                MRP ₹{originalTotal.toFixed(0)}
+              </span>
+            )}
+          </div>
+          {savings > 0 && (
+            <p className="text-xs text-green-600 font-semibold">
+              You save ₹{savings.toFixed(0)} on this kit!
+            </p>
+          )}
         </div>
       </CardContent>
 
