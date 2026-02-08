@@ -41,7 +41,6 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
     
     setIsLoading(true);
     try {
-      // Get user's cart
       const { data: cart, error: cartError } = await supabase
         .from('carts')
         .select('id')
@@ -53,7 +52,6 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
       if (cart) {
         setCartId(cart.id);
         
-        // Fetch cart items with product details
         const { data: items, error: itemsError } = await supabase
           .from('cart_items')
           .select(`
@@ -80,7 +78,6 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
 
     setIsAdding(true);
     try {
-      // Check if item already exists
       const existingItem = cartItems.find(
         item => item.product_id === productId && item.kit_id === (kitId || null)
       );
@@ -100,10 +97,7 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
 
         if (error) throw error;
         await fetchCart();
-        toast.success('Added to cart!', {
-          icon: '🛒',
-          duration: 1500,
-        });
+        toast.success('Added to cart!', { icon: '🛒', duration: 1500 });
       }
     } catch (error) {
       console.error('Error adding to cart:', error);
@@ -121,7 +115,6 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
 
     setIsAdding(true);
     try {
-      // Add all kit items at once
       const kitItems = kit.kit_items.map(item => ({
         cart_id: cartId,
         product_id: item.product_id,
@@ -136,10 +129,7 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
 
       if (error) throw error;
       await fetchCart();
-      toast.success(`${kit.name} added to cart!`, {
-        icon: '📦',
-        duration: 1500,
-      });
+      toast.success(`${kit.name} added to cart!`, { icon: '📦', duration: 1500 });
     } catch (error) {
       console.error('Error adding kit to cart:', error);
       toast.error('Failed to add kit to cart');
@@ -150,18 +140,17 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
 
   const removeFromCart = async (itemId: string) => {
     try {
-      const item = cartItems.find(i => i.id === itemId);
-      if (item?.is_kit_item) {
-        toast.error('Cannot remove mandatory kit items');
-        return;
-      }
-
       const { error } = await supabase
         .from('cart_items')
         .delete()
         .eq('id', itemId);
 
-      if (error) throw error;
+      if (error) {
+        // RLS policy blocks deletion of mandatory kit items
+        toast.error('Cannot remove this item — it\'s a mandatory kit item');
+        return;
+      }
+
       setCartItems(prev => prev.filter(item => item.id !== itemId));
       toast.success('Removed from cart');
     } catch (error) {
@@ -174,16 +163,6 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
     if (quantity < 1) return;
 
     try {
-      const item = cartItems.find(i => i.id === itemId);
-      if (item?.is_kit_item) {
-        // For kit items, ensure minimum quantity
-        const kitItem = cartItems.find(ci => ci.id === itemId);
-        if (kitItem && quantity < kitItem.quantity) {
-          toast.error('Cannot reduce below minimum kit quantity');
-          return;
-        }
-      }
-
       const { error } = await supabase
         .from('cart_items')
         .update({ quantity })
@@ -229,17 +208,9 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
   return (
     <CartContext.Provider
       value={{
-        cartItems,
-        cartId,
-        isLoading,
-        isAdding,
-        addToCart,
-        addKitToCart,
-        removeFromCart,
-        updateQuantity,
-        clearCart,
-        totalItems,
-        totalPrice,
+        cartItems, cartId, isLoading, isAdding,
+        addToCart, addKitToCart, removeFromCart, updateQuantity, clearCart,
+        totalItems, totalPrice,
       }}
     >
       {children}

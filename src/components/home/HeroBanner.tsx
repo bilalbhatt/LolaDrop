@@ -44,8 +44,7 @@ export function HeroBanner() {
               <Link to="/products">
                 <Button 
                   size="lg" 
-                  variant="outline" 
-                  className="border-primary-foreground/30 text-primary-foreground hover:bg-primary-foreground/10"
+                  className="bg-lola-yellow-400 text-foreground hover:bg-lola-yellow-500 font-semibold shadow-lg"
                 >
                   Browse Products
                 </Button>

@@ -1,5 +1,6 @@
-import { Zap, Phone, Mail, MapPin } from 'lucide-react';
+import { Phone, Mail, MapPin } from 'lucide-react';
 import { Link } from 'react-router-dom';
+import logoImg from '@/assets/logo.png';
 
 export function Footer() {
   return (
@@ -9,12 +10,7 @@ export function Footer() {
           {/* Brand */}
           <div className="space-y-4">
             <div className="flex items-center gap-2">
-              <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-primary">
-                <Zap className="h-5 w-5 text-primary-foreground" />
-              </div>
-              <span className="font-display text-xl font-bold">
-                Lola<span className="text-primary">Drop</span>
-              </span>
+              <img src={logoImg} alt="LolaDrop" className="h-10 w-auto brightness-0 invert" />
             </div>
             <p className="text-sm text-background/70">
               Your daily essentials, delivered same day. Fresh groceries, unbeatable prices.

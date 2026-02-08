@@ -19,6 +19,8 @@ import OrdersPage from "./pages/OrdersPage";
 import Checkout from "./pages/Checkout";
 import ProfilePage from "./pages/ProfilePage";
 import AboutPage from "./pages/AboutPage";
+import KitDetail from "./pages/KitDetail";
+import BecomeSeller from "./pages/BecomeSeller";
 
 const queryClient = new QueryClient();
 
@@ -34,6 +36,8 @@ const App = () => (
               <Route path="/" element={<Index />} />
               <Route path="/auth" element={<Auth />} />
               <Route path="/kits" element={<Kits />} />
+              <Route path="/kits/:kitId" element={<KitDetail />} />
+              <Route path="/become-seller" element={<BecomeSeller />} />
               <Route path="/products" element={<Products />} />
               <Route path="/cart" element={<Cart />} />
               <Route path="/checkout" element={<Checkout />} />

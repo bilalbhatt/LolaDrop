@@ -1,5 +1,6 @@
 import { Link, useNavigate } from 'react-router-dom';
-import { ShoppingCart, User, Menu, Search, Zap, ShoppingBag } from 'lucide-react';
+import { ShoppingCart, User, Menu, Search, ShoppingBag, Store, Truck } from 'lucide-react';
+import logoImg from '@/assets/logo.png';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { useAuth } from '@/contexts/AuthContext';
@@ -55,12 +56,7 @@ export function Header() {
       <div className="container flex h-16 items-center justify-between gap-4">
         {/* Logo */}
         <Link to="/" className="flex items-center gap-2">
-          <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-gradient-hero">
-            <Zap className="h-5 w-5 text-primary-foreground" />
-          </div>
-          <span className="font-display text-xl font-bold text-foreground">
-            Lola<span className="text-primary">Drop</span>
-          </span>
+          <img src={logoImg} alt="LolaDrop" className="h-10 w-auto" />
         </Link>
 
         {/* Search - Desktop */}
@@ -104,7 +100,7 @@ export function Header() {
 
         {/* Delivery Badge */}
         <div className="hidden lg:flex items-center gap-2 px-3 py-1.5 rounded-full bg-accent">
-          <Zap className="h-4 w-4 text-primary" />
+          <Truck className="h-4 w-4 text-primary" />
           <span className="text-sm font-medium text-accent-foreground">Same Day Delivery</span>
         </div>
 
@@ -225,6 +221,14 @@ export function Header() {
                     onClick={() => setIsMenuOpen(false)}
                   >
                     About Us
+                  </Link>
+                  <Link 
+                    to="/become-seller" 
+                    className="px-4 py-2 rounded-lg bg-secondary/10 text-secondary font-medium hover:bg-secondary/20 transition-colors"
+                    onClick={() => setIsMenuOpen(false)}
+                  >
+                    <Store className="h-4 w-4 inline mr-2" />
+                    Become a Seller
                   </Link>
                 </nav>
               </div>
